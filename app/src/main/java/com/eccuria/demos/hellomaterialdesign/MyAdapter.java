@@ -11,17 +11,14 @@ import android.widget.TextView;
  */
 public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder>  {
     private String[] dataset;
-
-    public static class ViewHolder extends RecyclerView.ViewHolder {
-        public TextView txtContent;
-        public ViewHolder(View v) {
-            super(v);
-            txtContent = (TextView)v.findViewById(R.id.txtContent);
-        }
-    }
+    private OnItemClickListener clickListener;
 
     public MyAdapter(String[] dataset) {
         this.dataset = dataset;
+    }
+
+    public void setOnItemClickListener(OnItemClickListener clickListener) {
+        this.clickListener = clickListener;
     }
 
     @Override
@@ -34,11 +31,37 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder>  {
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        holder.txtContent.setText(dataset[position]);
+        String element = dataset[position];
+        holder.txtContent.setText(element);
+        if (this.clickListener != null) {
+            holder.setOnItemClickListener(element, this.clickListener);
+        }
     }
 
     @Override
     public int getItemCount() {
         return dataset.length;
+    }
+
+    public static class ViewHolder extends RecyclerView.ViewHolder {
+        private View view;
+        public TextView txtContent;
+
+        public ViewHolder(View view) {
+            super(view);
+            this.view = view;
+            txtContent = (TextView)view.findViewById(R.id.txtContent);
+        }
+
+        public void setOnItemClickListener(final String element,
+                                            final OnItemClickListener listener) {
+            view.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    listener.onItemClick(element);
+                }
+            });
+
+        }
     }
 }
